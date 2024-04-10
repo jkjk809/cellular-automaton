@@ -11,10 +11,10 @@ SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
 
 struct cell {
-	int x;
-	int y;
-	int height;
-	int width;
+	float x;
+	float y;
+	float height;
+	float width;
 } cell;
 
 // methods
@@ -28,10 +28,10 @@ void next_gen(bool** cellArray, bool** temp);
 void clrscr();
 
 void setup() {
-	cell.x = 0;
-	cell.y = 0;
-	cell.height = 5;
-	cell.width = 5;
+	cell.x = 0.0;
+	cell.y = 0.0;
+	cell.height = 5.0;
+	cell.width = 5.0;
 }
 
 int main(int argc, char* args[]) {
@@ -80,7 +80,7 @@ int main(int argc, char* args[]) {
 		timeSpent += deltaTime;
 		
 		
-		if (timeSpent >= 70) {
+		if (timeSpent >= 100) {
 			render(cellArray);
 			next_gen(cellArray, temp);
 			timeSpent = 0;
@@ -123,18 +123,17 @@ void render(bool** cellArray) {
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 	SDL_RenderClear(renderer);
 
-	for (int i = 0; i < row; i++) {
+	for (int i = 0.0; i < row; i++) {
 		for (int j = 0; j < col; j++) {
 			if (cellArray[i][j]) {
-				SDL_Rect cellRect = { j * cell.width, i * cell.height, cell.width, cell.height };
-				SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+				SDL_Rect cellRect = { (float)j * cell.width, (float) i * cell.height, cell.width, cell.height };
+				SDL_SetRenderDrawColor(renderer, 210, 215, 211, 255);
 				SDL_RenderFillRect(renderer, &cellRect);
 			}
 		}
 	}
 
 	SDL_RenderPresent(renderer);
-
 }
 
 void destroy_window() {
