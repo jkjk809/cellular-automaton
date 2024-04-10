@@ -3,17 +3,11 @@
 #include <SDL.h>
 #include <time.h>
 #include <conio.h>
-#define TRUE 1
-#define FALSE 0
 
-int row = 20;
-int col = 80;
+int row = 250;
+int col = 400;
 SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
-
-int game_run = FALSE;
-
-
 
 struct cell {
 	float x;
@@ -21,11 +15,10 @@ struct cell {
 	float height;
 	float width;
 } cell;
+
 // methods
-int init_window();
-void setup();
-void render();
-void process_input();
+bool init_window();
+void render(bool** cellArray);
 void destroy_window();
 void setup_cell_array(bool** cellArray);
 void print_array(bool** cellArray);
@@ -33,11 +26,19 @@ void copy_array(bool** cellArray, bool** temp);
 void next_gen(bool** cellArray, bool** temp);
 void clrscr();
 
+void setup() {
+	cell.x = 0.0;
+	cell.y = 0.0;
+	cell.height = 5.0;
+	cell.width = 5.0;
+}
+
 int main(int argc, char* args[]) {
 
-	// uncomment to create window. no graphics right now.
-	//int game_run = init_window();
-	int game_run = TRUE;
+	 
+	bool isRunning = init_window();
+	
+	//int game_run = TRUE;
 	srand(time(NULL));
 
 	setup();
@@ -52,17 +53,25 @@ int main(int argc, char* args[]) {
 		temp[i] = (bool*)malloc(col * sizeof(bool));
 	}
 
-	setup_cell_array(cellArray);
-	print_array(cellArray);
 	
+
 	Uint64 NOW = SDL_GetPerformanceCounter();
 	Uint64 LAST = 0;
 	double deltaTime = 0;
 	double timeSpent = 0;
 
-	while (game_run)
+	SDL_Event ev;
+	setup_cell_array(cellArray);
+
+	while (isRunning)
 	{
-		process_input();
+		while (SDL_PollEvent(&ev) != 0) {
+			if (ev.type == SDL_QUIT)
+				isRunning = false;
+			if (ev.key.keysym.sym == SDLK_ESCAPE)
+				isRunning = false;
+		}
+		
 		LAST = NOW;
 		NOW = SDL_GetPerformanceCounter();
 		deltaTime = (double)((NOW - LAST) * 1000 / (double)SDL_GetPerformanceFrequency());
@@ -70,10 +79,8 @@ int main(int argc, char* args[]) {
 		
 		
 		if (timeSpent >= 70) {
-			clrscr();
-			print_array(cellArray);
+			render(cellArray);
 			next_gen(cellArray, temp);
-			render();
 			timeSpent = 0;
 		}
 
@@ -93,55 +100,39 @@ int main(int argc, char* args[]) {
 	return 0;
 }
 
-int init_window() {
+bool init_window() {
 	SDL_Init(SDL_INIT_EVERYTHING);
-	window = SDL_CreateWindow(NULL, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1920, 1080, SDL_WINDOW_BORDERLESS);
+	window = SDL_CreateWindow(NULL, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1920, 1080, SDL_WINDOW_FOREIGN);
 
 	if (!window) {
 		fprintf(stderr, "Error creating window. \n");
-		return FALSE;
+		return false;
 	}
 	renderer = SDL_CreateRenderer(window, -1, 0);
 
 	if (!renderer) {
 		fprintf(stderr, "Error creating renderer. \n");
-		return FALSE;
+		return false;
 	}
-	return TRUE;
+	return true;
 }
 
-void setup() {
-	cell.x = 30.0;
-	cell.y = 30.0;
-	cell.height = 10.0;
-	cell.width = 10.0;
-}
-
-void render() {
+void render(bool** cellArray) {
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 	SDL_RenderClear(renderer);
 
-	SDL_Rect singleCell = { cell.x, cell.y, cell.width, cell.height };
-
-	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-	SDL_RenderFillRect(renderer, &singleCell);
+	for (int i = 0; i < row; i++) {
+		for (int j = 0; j < col; j++) {
+			if (cellArray[i][j]) {
+				SDL_Rect cellRect = { j * cell.width, i * cell.height, cell.width, cell.height };
+				SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+				SDL_RenderFillRect(renderer, &cellRect);
+			}
+		}
+	}
 
 	SDL_RenderPresent(renderer);
 
-}
-
-void process_input() {
-	SDL_Event event;
-	SDL_PollEvent(&event);
-	switch (event.type) {
-	case SDL_QUIT:
-		game_run = FALSE;
-		break;
-	case SDL_KEYDOWN:
-		if (event.key.keysym.sym == SDLK_ESCAPE)
-			game_run = FALSE;
-		break;
-	}
 }
 
 void destroy_window() {
