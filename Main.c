@@ -3,6 +3,7 @@
 #include <SDL.h>
 #include <time.h>
 #include <conio.h>
+#include <stdlib.h>
 
 int row = 250;
 int col = 400;
@@ -10,10 +11,10 @@ SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
 
 struct cell {
-	float x;
-	float y;
-	float height;
-	float width;
+	int x;
+	int y;
+	int height;
+	int width;
 } cell;
 
 // methods
@@ -27,10 +28,10 @@ void next_gen(bool** cellArray, bool** temp);
 void clrscr();
 
 void setup() {
-	cell.x = 0.0;
-	cell.y = 0.0;
-	cell.height = 5.0;
-	cell.width = 5.0;
+	cell.x = 0;
+	cell.y = 0;
+	cell.height = 5;
+	cell.width = 5;
 }
 
 int main(int argc, char* args[]) {
@@ -39,7 +40,8 @@ int main(int argc, char* args[]) {
 	bool isRunning = init_window();
 	
 	//int game_run = TRUE;
-	srand(time(NULL));
+	unsigned int seed = (unsigned int)time(NULL); // Line 43
+	srand(seed);
 
 	setup();
 	// create cell array and temp.
