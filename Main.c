@@ -80,7 +80,7 @@ int main(int argc, char* args[]) {
 		timeSpent += deltaTime;
 		
 		
-		if (timeSpent >= 100) {
+		if (timeSpent >= 50) {
 			render(cellArray);
 			next_gen(cellArray, temp);
 			timeSpent = 0;
