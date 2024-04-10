@@ -1,3 +1,2 @@
 # CellularAutomaton
-## Project Status:
-Currently runs in output window.
+Programmed in C with SDL2 for graphics.
